@@ -1,0 +1,21 @@
+FROM golang:1.16-alpine AS base
+RUN apk add --no-cache git
+RUN git clone https://github.com/ethannew/httpserver.git
+
+WORKDIR httpserver/src/httpserver
+RUN go env -w GO111MODULE=auto
+RUN go build -o /bin/httpserver
+
+FROM scratch
+COPY --from=base /bin/httpserver /bin/httpserver
+EXPOSE 80
+ENTRYPOINT ["/bin/httpserver"]
+
+# docker build
+docker build -t dockerhub.com/httpserver:v1.0
+
+# docker push
+docker push dockerhub.com/httpserver:v1.0
+
+# docker run
+docker run -it dockerhub.com/httpserver:v1.0
